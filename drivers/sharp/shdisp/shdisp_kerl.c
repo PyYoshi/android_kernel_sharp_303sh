@@ -4111,6 +4111,14 @@ static int shdisp_SQE_main_bkl_set_eco_mode(int eco_mode)
 }
 #endif /* SHDISP_NOT_SUPPORT_BKL_ECO_MODE */
 
+/* ------------------------------------------------------------------------- */
+/* shdisp_get_usb_info                                                       */
+/* ------------------------------------------------------------------------- */
+
+int shdisp_get_usb_info(void)
+{
+    return shdisp_kerl_ctx.usb_chg_status;
+}
 
 /* ------------------------------------------------------------------------- */
 /* shdisp_SQE_main_bkl_set_chg_mode                                          */
@@ -4121,12 +4129,20 @@ static int shdisp_SQE_main_bkl_set_chg_mode(int chg_mode)
 {
     unsigned long int notify_brightness = 0;
 
+    shdisp_kerl_ctx.usb_chg_status = SHDISP_MAIN_BKL_CHG_OFF;
+
     if (chg_mode == SHDISP_MAIN_BKL_CHG_OFF) {
         SHDISP_TRACE("BKL_CHG_MODE : OFF\n");
+        if (shdisp_pm_is_clmr_on() == SHDISP_DEV_STATE_ON) {
+            shdisp_panel_API_request_RateCtrl(1, SHDISP_PANEL_RATE_60_0, SHDISP_PANEL_RATE_1);
+        }
         shdisp_bdic_API_LCD_BKL_chg_off();
     }
     else if(chg_mode == SHDISP_MAIN_BKL_CHG_ON) {
         SHDISP_TRACE("BKL_CHG_MODE : ON\n");
+        if (shdisp_pm_is_clmr_on() == SHDISP_DEV_STATE_ON) {
+            shdisp_panel_API_request_RateCtrl(1, SHDISP_PANEL_RATE_60_0, SHDISP_PANEL_RATE_60_0);
+        }
         shdisp_bdic_API_LCD_BKL_chg_on();
     }
     else {

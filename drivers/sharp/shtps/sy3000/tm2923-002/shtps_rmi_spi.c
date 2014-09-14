@@ -121,6 +121,7 @@
 #define SHTPS_HOVER_REJECTION_ENABLE
 #define SHTPS_LGM_FAIL_TOUCH_UP_REJECTION_ENABLE
 #define SHTPS_LGM_SPLIT_TOUCH_COMBINING_ENABLE
+#define SHTPS_DRAG_SMOOTH_ENABLE
 
 /* -----------------------------------------------------------------------------------
  */
@@ -183,6 +184,7 @@
 
 #if defined(SHTPS_PHYSICAL_KEY_ENABLE)
 	#define SHTPS_FINGER_KEY_EXCLUDE_ENABLE
+	#define SHTPS_KEY_THRESHOLD_CHANGE_ENABLE
 
 	#if defined(SHTPS_PROXIMITY_SUPPORT_ENABLE)
 		#define SHTPS_KEY_PROXIMITY_ASYNC_CHECK_ENABLE
@@ -682,15 +684,23 @@
 #endif /* SHTPS_KEY_PROXIMITY_ASYNC_CHECK_ENABLE */
 
 #if defined(SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECTION_ENABLE)
-	static int SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_REZERO_ENABLE = 1;
-	module_param(SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_REZERO_ENABLE, int, S_IRUGO | S_IWUSR);
+	#if defined( SHTPS_DEBUG_VARIABLE_DEFINES )
+		static int SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_REZERO_ENABLE = 1;
+		module_param(SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_REZERO_ENABLE, int, S_IRUGO | S_IWUSR);
+	#else
+		#define SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_REZERO_ENABLE	    1
+	#endif /* SHTPS_DEBUG_VARIABLE_DEFINES ) */
 
-	static int SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_LOG_ENABLE = 0;
-	module_param(SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_LOG_ENABLE, int, S_IRUGO | S_IWUSR);
-	#define	SHTPS_LOG_WAKEUP_FAIL_TOUCH_EVENT_REJECT(...)					\
-		if(SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_LOG_ENABLE != 0){			\
-			printk(KERN_DEBUG "[shtps] [wakeup_fail_event]" __VA_ARGS__);	\
-		}
+	#if defined( SHTPS_LOG_DEBUG_ENABLE )
+		static int SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_LOG_ENABLE = 0;
+		module_param(SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_LOG_ENABLE, int, S_IRUGO | S_IWUSR);
+		#define	SHTPS_LOG_WAKEUP_FAIL_TOUCH_EVENT_REJECT(...)					\
+			if(SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECT_LOG_ENABLE != 0){			\
+				printk(KERN_DEBUG "[shtps] [wakeup_fail_event]" __VA_ARGS__);	\
+			}
+	#else
+		#define	SHTPS_LOG_WAKEUP_FAIL_TOUCH_EVENT_REJECT(...)
+	#endif /* SHTPS_LOG_DEBUG_ENABLE */
 #endif /* SHTPS_WAKEUP_FAIL_TOUCH_EVENT_REJECTION_ENABLE */
 
 #if defined( SHTPS_TPIN_CHECK_ENABLE ) || defined( SHTPS_CHECK_CRC_ERROR_ENABLE )
@@ -752,6 +762,8 @@
 		static int SHTPS_CLING_REJECT_MODE16_ENABLE =			1;
 		static int SHTPS_CLING_REJECT_MODE17_ENABLE =			1;
 		static int SHTPS_CLING_REJECT_MODE18_ENABLE =			1;
+		static int SHTPS_CLING_REJECT_MODE19_ENABLE =			1;
+		static int SHTPS_CLING_REJECT_MODE20_ENABLE =			1;
 
 		static int SHTPS_CLING_REJECT_MODE0_REZERO_TYPE =		1;
 		static int SHTPS_CLING_REJECT_MODE1_REZERO_TYPE =		1;
@@ -771,12 +783,15 @@
 		static int SHTPS_CLING_REJECT_MODE16_REZERO_TYPE =		1;
 		static int SHTPS_CLING_REJECT_MODE17_REZERO_TYPE =		1;
 		static int SHTPS_CLING_REJECT_MODE18_REZERO_TYPE =		1;
+		static int SHTPS_CLING_REJECT_MODE19_REZERO_TYPE =		1;
+		static int SHTPS_CLING_REJECT_MODE20_REZERO_TYPE =		1;
 
 		static int SHTPS_CLING_REJECT_MODE0_Z_THRESH =			75;
 		static int SHTPS_CLING_REJECT_MODE0_OFFSET_Z =			255;
 		static int SHTPS_CLING_REJECT_MODE0_CNT =				254;
 		static int SHTPS_CLING_REJECT_MODE0_CNT_CHANGE_TIME =	5000;
 		static int SHTPS_CLING_REJECT_MODE0_MOVE_THRESH =		400;
+		static int SHTPS_CLING_REJECT_MODE0_TU_ALLOW_TIME =		50;
 		static int SHTPS_CLING_REJECT_MODE1_WX_THRESH =			15;
 		static int SHTPS_CLING_REJECT_MODE1_WY_FIX =			0;
 		static int SHTPS_CLING_REJECT_MODE1_CNT =				10;
@@ -787,9 +802,11 @@
 		static int SHTPS_CLING_REJECT_MODE3_X_MOVE_THRESH =		40;
 		static int SHTPS_CLING_REJECT_MODE4_DELAY_TIME_MS =		2000;
 		static int SHTPS_CLING_REJECT_MODE5_Z_THRESH =			225;
-		static int SHTPS_CLING_REJECT_MODE5_OFFSET_Z =			2;
+		static int SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE =		1;
 		static int SHTPS_CLING_REJECT_MODE5_CNT =				254;
-		static int SHTPS_CLING_REJECT_MODE5_POS_THRESH =		9999;
+		static int SHTPS_CLING_REJECT_MODE5_POS_THRESH =		300;
+		static int SHTPS_CLING_REJECT_MODE5_CNT_CHANGE_THRESH =	100;
+		static int SHTPS_CLING_REJECT_MODE5_TU_POS_THRESH =		300;
 		static int SHTPS_CLING_REJECT_MODE6_Z_SMALL_THRESH =	135;
 		static int SHTPS_CLING_REJECT_MODE6_Z_LARGE_THRESH =	205;
 		static int SHTPS_CLING_REJECT_MODE6_WX_SMALL_THRESH =	10;
@@ -847,7 +864,13 @@
 		static int SHTPS_CLING_REJECT_MODE17_ZMAG_THRESH =		30;
 		#define SHTPS_CLING_REJECT_MODE17_Z_HIST_LIST_NUM		5
 		static int SHTPS_CLING_REJECT_MODE18_CHECK_TIME =		2000;
-
+		static int SHTPS_CLING_REJECT_MODE19_FINGER_NUM =		3;
+		static int SHTPS_CLING_REJECT_MODE19_TOUCH_TIMEOUT_MS =	3000;
+		static int SHTPS_CLING_REJECT_MODE19_ENABLE_TIME =		15000;
+		static int SHTPS_CLING_REJECT_MODE20_INTERVAL_THRESH =	17;
+		static int SHTPS_CLING_REJECT_MODE20_COUNT_MAX =		10;
+		static int SHTPS_CLING_REJECT_MODE20_TU_POS_THRESH =	300;
+		
 		#if defined( SHTPS_MODULE_PARAM_ENABLE )
 			module_param(SHTPS_CLING_REJECT_MODE0_ENABLE, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE1_ENABLE, int, S_IRUGO | S_IWUSR);
@@ -867,6 +890,8 @@
 			module_param(SHTPS_CLING_REJECT_MODE16_ENABLE, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE17_ENABLE, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE18_ENABLE, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE19_ENABLE, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE20_ENABLE, int, S_IRUGO | S_IWUSR);
 
 			module_param(SHTPS_CLING_REJECT_MODE0_REZERO_TYPE, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE1_REZERO_TYPE, int, S_IRUGO | S_IWUSR);
@@ -886,12 +911,15 @@
 			module_param(SHTPS_CLING_REJECT_MODE16_REZERO_TYPE, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE17_REZERO_TYPE, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE18_REZERO_TYPE, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE19_REZERO_TYPE, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE20_REZERO_TYPE, int, S_IRUGO | S_IWUSR);
 
 			module_param(SHTPS_CLING_REJECT_MODE0_Z_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE0_OFFSET_Z, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE0_CNT, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE0_CNT_CHANGE_TIME, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE0_MOVE_THRESH, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE0_TU_ALLOW_TIME, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE1_WX_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE1_WY_FIX, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE1_CNT, int, S_IRUGO | S_IWUSR);
@@ -902,9 +930,11 @@
 			module_param(SHTPS_CLING_REJECT_MODE3_X_MOVE_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE4_DELAY_TIME_MS, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE5_Z_THRESH, int, S_IRUGO | S_IWUSR);
-			module_param(SHTPS_CLING_REJECT_MODE5_OFFSET_Z, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE5_CNT, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE5_POS_THRESH, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE5_CNT_CHANGE_THRESH, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE5_TU_POS_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE6_Z_SMALL_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE6_Z_LARGE_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE6_WX_SMALL_THRESH, int, S_IRUGO | S_IWUSR);
@@ -955,6 +985,12 @@
 			module_param(SHTPS_CLING_REJECT_MODE17_MOVE_TIME_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE17_ZMAG_THRESH, int, S_IRUGO | S_IWUSR);
 			module_param(SHTPS_CLING_REJECT_MODE18_CHECK_TIME, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE19_FINGER_NUM, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE19_TOUCH_TIMEOUT_MS, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE19_ENABLE_TIME, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE20_INTERVAL_THRESH, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE20_COUNT_MAX, int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_CLING_REJECT_MODE20_TU_POS_THRESH, int, S_IRUGO | S_IWUSR);
 
 			static int SHTPS_CLING_REJECT_REZERO_EXEC_COUNT = 0;
 			module_param(SHTPS_CLING_REJECT_REZERO_EXEC_COUNT, int, S_IRUGO | S_IWUSR);
@@ -978,6 +1014,8 @@
 		#define SHTPS_CLING_REJECT_MODE16_ENABLE			1
 		#define SHTPS_CLING_REJECT_MODE17_ENABLE			1
 		#define SHTPS_CLING_REJECT_MODE18_ENABLE			1
+		#define SHTPS_CLING_REJECT_MODE19_ENABLE			1
+		#define SHTPS_CLING_REJECT_MODE20_ENABLE			1
 
 		#define SHTPS_CLING_REJECT_MODE0_REZERO_TYPE		1
 		#define SHTPS_CLING_REJECT_MODE1_REZERO_TYPE		1
@@ -997,12 +1035,15 @@
 		#define SHTPS_CLING_REJECT_MODE16_REZERO_TYPE		1
 		#define SHTPS_CLING_REJECT_MODE17_REZERO_TYPE		1
 		#define SHTPS_CLING_REJECT_MODE18_REZERO_TYPE		1
+		#define SHTPS_CLING_REJECT_MODE19_REZERO_TYPE		1
+		#define SHTPS_CLING_REJECT_MODE20_REZERO_TYPE		1
 
 		#define SHTPS_CLING_REJECT_MODE0_Z_THRESH			75
 		#define SHTPS_CLING_REJECT_MODE0_OFFSET_Z			255
 		#define SHTPS_CLING_REJECT_MODE0_CNT				254
 		#define SHTPS_CLING_REJECT_MODE0_CNT_CHANGE_TIME	5000
 		#define SHTPS_CLING_REJECT_MODE0_MOVE_THRESH		400
+		#define SHTPS_CLING_REJECT_MODE0_TU_ALLOW_TIME		50
 		#define SHTPS_CLING_REJECT_MODE1_WX_THRESH			15
 		#define SHTPS_CLING_REJECT_MODE1_WY_FIX				0
 		#define SHTPS_CLING_REJECT_MODE1_CNT				10
@@ -1013,9 +1054,11 @@
 		#define SHTPS_CLING_REJECT_MODE3_X_MOVE_THRESH		40
 		#define SHTPS_CLING_REJECT_MODE4_DELAY_TIME_MS		2000
 		#define SHTPS_CLING_REJECT_MODE5_Z_THRESH			225
-		#define SHTPS_CLING_REJECT_MODE5_OFFSET_Z			2
+		#define SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE		1
 		#define SHTPS_CLING_REJECT_MODE5_CNT				254
-		#define SHTPS_CLING_REJECT_MODE5_POS_THRESH			9999
+		#define SHTPS_CLING_REJECT_MODE5_POS_THRESH			300
+		#define SHTPS_CLING_REJECT_MODE5_CNT_CHANGE_THRESH	100
+		#define SHTPS_CLING_REJECT_MODE5_TU_POS_THRESH		300
 		#define SHTPS_CLING_REJECT_MODE6_Z_SMALL_THRESH		135
 		#define SHTPS_CLING_REJECT_MODE6_Z_LARGE_THRESH		205
 		#define SHTPS_CLING_REJECT_MODE6_WX_SMALL_THRESH	10
@@ -1073,6 +1116,12 @@
 		#define SHTPS_CLING_REJECT_MODE17_ZMAG_THRESH		30
 		#define SHTPS_CLING_REJECT_MODE17_Z_HIST_LIST_NUM	5
 		#define SHTPS_CLING_REJECT_MODE18_CHECK_TIME						2000
+		#define SHTPS_CLING_REJECT_MODE19_FINGER_NUM 		3
+		#define SHTPS_CLING_REJECT_MODE19_TOUCH_TIMEOUT_MS 	3000
+		#define SHTPS_CLING_REJECT_MODE19_ENABLE_TIME 		15000
+		#define SHTPS_CLING_REJECT_MODE20_INTERVAL_THRESH 	17
+		#define SHTPS_CLING_REJECT_MODE20_COUNT_MAX			10
+		#define SHTPS_CLING_REJECT_MODE20_TU_POS_THRESH 	300
 	#endif /* SHTPS_DEBUG_VARIABLE_DEFINES */
 
 	#if defined( SHTPS_LOG_DEBUG_ENABLE )
@@ -1317,6 +1366,62 @@
 	#endif /* SHTPS_LOG_DEBUG_ENABLE */
 #endif /* SHTPS_LGM_SPLIT_TOUCH_COMBINING_ENABLE */
 
+#if defined( SHTPS_DRAG_SMOOTH_ENABLE )
+	#define SHTPS_DRAG_HISTORY_SIZE_MAX					30
+	#define SHTPS_DRAG_SMOOTH_INT_TO_FIXED(val)			((val) << SHTPS_DRAG_SMOOTH_FIXED_SHIFT)
+	#define SHTPS_DRAG_SMOOTH_FIXED_TO_INT(val)			((val) >> SHTPS_DRAG_SMOOTH_FIXED_SHIFT)
+
+	#if defined( SHTPS_DEBUG_VARIABLE_DEFINES )
+		static int SHTPS_DRAG_SMOOTH_DISABLE = 			0;
+		static int SHTPS_DRAG_SMOOTH_LEAVE_MAX_DOT = 	10;
+		static int SHTPS_DRAG_SMOOTH_COUNT_MIN = 		5;
+		static int SHTPS_DRAG_SMOOTH_COUNT_MAX = 		20;
+		static int SHTPS_DRAG_SMOOTH_COUNT_UP_STEP = 	5;
+		static int SHTPS_DRAG_SMOOTH_FIXED_SHIFT = 		8;
+		#if defined( SHTPS_MODULE_PARAM_ENABLE )
+			module_param(SHTPS_DRAG_SMOOTH_DISABLE,			int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_DRAG_SMOOTH_LEAVE_MAX_DOT,	int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_DRAG_SMOOTH_COUNT_MIN,		int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_DRAG_SMOOTH_COUNT_MAX,		int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_DRAG_SMOOTH_COUNT_UP_STEP,	int, S_IRUGO | S_IWUSR);
+			module_param(SHTPS_DRAG_SMOOTH_FIXED_SHIFT,		int, S_IRUGO | S_IWUSR);
+		#endif /* SHTPS_MODULE_PARAM_ENABLE */
+	#else
+		#define SHTPS_DRAG_SMOOTH_DISABLE				0
+		#define SHTPS_DRAG_SMOOTH_LEAVE_MAX_DOT			10
+		#define SHTPS_DRAG_SMOOTH_COUNT_MIN				5
+		#define SHTPS_DRAG_SMOOTH_COUNT_MAX				20
+		#define SHTPS_DRAG_SMOOTH_COUNT_UP_STEP			5
+		#define SHTPS_DRAG_SMOOTH_FIXED_SHIFT			8
+	#endif /* SHTPS_DEBUG_VARIABLE_DEFINES ) */
+
+	#if defined( SHTPS_LOG_DEBUG_ENABLE )
+		static int SHTPS_DRAG_SMOOTH_LOG_ENABLE = 		0;
+		#if defined( SHTPS_MODULE_PARAM_ENABLE )
+			module_param(SHTPS_DRAG_SMOOTH_LOG_ENABLE,			int, S_IRUGO | S_IWUSR);
+		#else
+			#define SHTPS_DRAG_SMOOTH_LOG_ENABLE		0
+		#endif /* SHTPS_DEBUG_VARIABLE_DEFINES ) */
+		#define	SHTPS_LOG_DRAG_SMOOTH(...)									\
+			if(SHTPS_DRAG_SMOOTH_LOG_ENABLE != 0){							\
+				printk(KERN_DEBUG "[shtps] [drag_smooth]" __VA_ARGS__);	\
+			}
+	#else
+		#define	SHTPS_LOG_DRAG_SMOOTH(...)
+	#endif /* SHTPS_LOG_DEBUG_ENABLE */
+#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
+
+#if defined( SHTPS_KEY_THRESHOLD_CHANGE_ENABLE )
+	#if defined( SHTPS_DEBUG_VARIABLE_DEFINES )
+		static int SHTPS_KEY_VOL_DOWN_THRESHOLD = 	0x60;
+		#if defined( SHTPS_MODULE_PARAM_ENABLE )
+			module_param(SHTPS_KEY_VOL_DOWN_THRESHOLD, int, S_IRUGO | S_IWUSR);
+		#endif /* SHTPS_MODULE_PARAM_ENABLE */
+	#else
+		#define SHTPS_KEY_VOL_DOWN_THRESHOLD		0x60
+	#endif /* SHTPS_DEBUG_VARIABLE_DEFINES ) */
+#endif /* SHTPS_KEY_THRESHOLD_CHANGE_ENABLE */
+
 /* -----------------------------------------------------------------------------------
  */
 static DEFINE_MUTEX(shtps_ctrl_lock);
@@ -1403,6 +1508,12 @@ struct shtps_drag_hist{
 	int							pre;
 	u8							dir;
 	u8							count;
+	#if defined( SHTPS_DRAG_SMOOTH_ENABLE )
+		int						history[SHTPS_DRAG_HISTORY_SIZE_MAX];
+		int						pre_comp_history_FIXED;
+		int						history_old;
+		int						count_up_base;
+	#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
 };
 
 #if defined(SHTPS_LPWG_MODE_ENABLE)
@@ -1495,11 +1606,17 @@ struct shtps_cling_reject{
 	u8									mode0_state[SHTPS_FINGER_MAX];
 	unsigned short						mode0_tap_x[SHTPS_FINGER_MAX];
 	unsigned short						mode0_tap_y[SHTPS_FINGER_MAX];
+	unsigned long						mode0_tu_time[SHTPS_FINGER_MAX];
 	u8									mode1_cling_cnt[SHTPS_FINGER_MAX];
 	u8									mode2_cling_cnt[SHTPS_FINGER_MAX];
 	u8									mode5_cling_cnt[SHTPS_FINGER_MAX];
 	unsigned short						mode5_center_x[SHTPS_FINGER_MAX];
 	unsigned short						mode5_center_y[SHTPS_FINGER_MAX];
+	u8									mode5_end_flag;
+	u8									mode5_cling_cnt_max[SHTPS_FINGER_MAX];
+	u8									mode5_wait_for_tu;
+	u8									mode5_tu_pos_cnt;
+	struct shtps_cling_reject_pos_hist	mode5_tu_pos[SHTPS_FINGER_MAX];
 	u8									mode7_cling_cnt_in[SHTPS_FINGER_MAX];
 	u8									mode7_cling_cnt_out[SHTPS_FINGER_MAX];
 	u8									mode7_cling_cnt_multi;
@@ -1558,6 +1675,14 @@ struct shtps_cling_reject{
 	u8									mode18_check_enable[SHTPS_FINGER_MAX];
 	unsigned short						mode18_x[SHTPS_FINGER_MAX];
 	unsigned short						mode18_y[SHTPS_FINGER_MAX];
+	u8									mode19_enable;
+	unsigned long						mode19_start_time;
+	u8									mode19_detect_state;
+	unsigned long						mode19_detect_start_time;
+	u8									mode20_wait_for_tu;
+	u8									mode20_count[SHTPS_FINGER_MAX];
+	unsigned long						mode20_time[SHTPS_FINGER_MAX];
+	struct shtps_cling_reject_pos_hist	mode20_tu_pos;
 	struct shtps_cling_reject_pos_hist	pos_hist[SHTPS_FINGER_MAX][SHTPS_CLING_REJECT_POS_HIST_MAX];
 	u8									pos_hist_count[SHTPS_FINGER_MAX];
 	u8									no_touch_reaction_check_state;
@@ -2041,6 +2166,12 @@ enum{
 	SHTPS_CLING_REJECT_MODE17_STATE_IDLE,
 	SHTPS_CLING_REJECT_MODE17_STATE_WAIT_FOR_TOUCH,
 	SHTPS_CLING_REJECT_MODE17_STATE_CLING_CHECK,
+};
+
+enum{
+	SHTPS_CLING_REJECT_MODE19_STATE_IDLE,
+	SHTPS_CLING_REJECT_MODE19_STATE_DETECT,
+	SHTPS_CLING_REJECT_MODE19_STATE_WAIT_ALL_TOUCHUP,
 };
 #endif /* SHTPS_CLING_REJECTION_ENABLE */
 
@@ -3631,6 +3762,10 @@ static void shtps_forcecal(struct shtps_rmi_spi *ts)
 			ts->cling_reject.mode9_state = 0;
 			SHTPS_LOG_CLING_REJECT("[mode_9] state = idle by forcecal\n");
 		}
+		
+		if(SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE){
+			ts->cling_reject.forcecal_in_touch = 1;
+		}
 	#endif /* SHTPS_CLING_REJECTION_ENABLE */
 	
 	shtps_rmi_write(ts, ts->map.fn54.commandBase, 0x02);
@@ -3652,6 +3787,10 @@ static void shtps_rezero(struct shtps_rmi_spi *ts)
 			ts->cling_reject.forcecal_in_touch = 0;
 			ts->cling_reject.mode9_state = 0;
 			SHTPS_LOG_CLING_REJECT("[mode_9] state = idle by rezero\n");
+		}
+		
+		if(SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE){
+			ts->cling_reject.forcecal_in_touch = 1;
 		}
 	#endif /* SHTPS_CLING_REJECTION_ENABLE */
 	
@@ -5144,6 +5283,10 @@ static int shtps_set_charger_armor(struct shtps_rmi_spi *ts, int on)
 							#endif /* SHTPS_WAIT_FOR_TU_BEFORE_REZERO_ENABLE */
 						}
 					#endif /* SHTPS_PIXEL_TOUCH_THRESHOLD_ENABLE */
+				
+					#if defined( SHTPS_CLING_REJECTION_ENABLE )
+						memset(ts->cling_reject.mode20_count, 0, sizeof(ts->cling_reject.mode20_count));
+					#endif /* SHTPS_CLING_REJECTION_ENABLE */
 				}
 			}
 		}
@@ -5360,6 +5503,11 @@ static int shtps_init_param(struct shtps_rmi_spi *ts)
 
 			rc = shtps_rmi_write(ts, ts->map.fn1A.ctrlBase + 2, 0x00);
 			SPI_ERR_CHECK(rc, err_exit);
+
+			#if defined( SHTPS_KEY_THRESHOLD_CHANGE_ENABLE )
+				rc = shtps_rmi_write(ts, ts->map.fn1A.ctrlBase + 0x13, SHTPS_KEY_VOL_DOWN_THRESHOLD);
+				SPI_ERR_CHECK(rc, err_exit);
+			#endif /* SHTPS_KEY_THRESHOLD_CHANGE_ENABLE */
 
 			rc = shtps_rmi_write(ts, 0xFF, 0x00);
 			SPI_ERR_CHECK(rc, err_exit);
@@ -5659,6 +5807,9 @@ static inline void shtps_init_drag_hist(struct shtps_rmi_spi *ts, int xy, int fi
 {
 	ts->drag_hist[finger][xy].pre   = pos;
 	ts->drag_hist[finger][xy].count = 0;
+	#if defined( SHTPS_DRAG_SMOOTH_ENABLE )
+		ts->drag_hist[finger][xy].count_up_base = 0;
+	#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
 }
 
 static void shtps_add_drag_hist(struct shtps_rmi_spi *ts, int xy, int finger, int pos)
@@ -5667,6 +5818,12 @@ static void shtps_add_drag_hist(struct shtps_rmi_spi *ts, int xy, int finger, in
 	u8 dir  = (pos > pre)? SHTPS_DRAG_DIR_PLUS :
 			  (pos < pre)? SHTPS_DRAG_DIR_MINUS :
 						   SHTPS_DRAG_DIR_NONE;
+
+	#if defined( SHTPS_DRAG_SMOOTH_ENABLE )
+		int i;
+		int drag_smooth_count_limit;
+		int drag_smooth_count_limit_new;
+	#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
 
 	SHTPS_LOG_DBG_PRINT("add drag hist[%d][%s] pre = %d, cur = %d, dir = %s, cnt = %d, remain time = %d\n",
 		finger, (xy == SHTPS_POSTYPE_X)? "X" : "Y",
@@ -5677,10 +5834,78 @@ static void shtps_add_drag_hist(struct shtps_rmi_spi *ts, int xy, int finger, in
 
 	if(dir != SHTPS_DRAG_DIR_NONE){
 		if(ts->drag_hist[finger][xy].count == 0){
+			#if defined( SHTPS_DRAG_SMOOTH_ENABLE )
+				if(!SHTPS_DRAG_SMOOTH_DISABLE){
+					#if defined( SHTPS_DEVELOP_MODE_ENABLE )
+						if(SHTPS_DRAG_SMOOTH_COUNT_MIN > SHTPS_DRAG_HISTORY_SIZE_MAX){
+							SHTPS_DRAG_SMOOTH_COUNT_MIN = SHTPS_DRAG_HISTORY_SIZE_MAX;
+						}
+						if(SHTPS_DRAG_SMOOTH_COUNT_MAX > SHTPS_DRAG_HISTORY_SIZE_MAX){
+							SHTPS_DRAG_SMOOTH_COUNT_MAX = SHTPS_DRAG_HISTORY_SIZE_MAX;
+						}
+					#endif /* #if defined( SHTPS_DEVELOP_MODE_ENABLE ) */
+					ts->drag_hist[finger][xy].history[ts->drag_hist[finger][xy].count] = pos;
+				}
+			#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
 			ts->drag_hist[finger][xy].dir   = dir;
 			ts->drag_hist[finger][xy].count = 1;
 		}else{
+
+			#if defined( SHTPS_DRAG_SMOOTH_ENABLE )
+				if(!SHTPS_DRAG_SMOOTH_DISABLE){
+					drag_smooth_count_limit = ts->drag_hist[finger][xy].count;
+					drag_smooth_count_limit_new = SHTPS_DRAG_SMOOTH_COUNT_MIN + (ts->drag_hist[finger][xy].count_up_base / SHTPS_DRAG_SMOOTH_COUNT_UP_STEP);
+					if(drag_smooth_count_limit < drag_smooth_count_limit_new){
+						drag_smooth_count_limit = drag_smooth_count_limit_new;
+					}
+					if(drag_smooth_count_limit > SHTPS_DRAG_SMOOTH_COUNT_MAX){
+						drag_smooth_count_limit = SHTPS_DRAG_SMOOTH_COUNT_MAX;
+					}
+
+					if(ts->drag_hist[finger][xy].dir != dir){
+						drag_smooth_count_limit = SHTPS_DRAG_SMOOTH_COUNT_MIN;
+						if(drag_smooth_count_limit < ts->drag_hist[finger][xy].count){
+							for(i= 0; i < drag_smooth_count_limit; i++){
+								ts->drag_hist[finger][xy].history[i] = ts->drag_hist[finger][xy].history[ts->drag_hist[finger][xy].count - drag_smooth_count_limit + i];
+							}
+							ts->drag_hist[finger][xy].count = drag_smooth_count_limit;
+						}
+
+						ts->drag_hist[finger][xy].count_up_base = 0;
+					}
+
+					if(ts->drag_hist[finger][xy].count < SHTPS_DRAG_SMOOTH_COUNT_MIN-1){
+						ts->drag_hist[finger][xy].history[ts->drag_hist[finger][xy].count] = pos;
+						ts->drag_hist[finger][xy].pre_comp_history_FIXED = SHTPS_DRAG_SMOOTH_INT_TO_FIXED(pos);
+						ts->drag_hist[finger][xy].count++;
+					}else{
+						if(ts->drag_hist[finger][xy].count == drag_smooth_count_limit-1){
+							ts->drag_hist[finger][xy].count++;
+						}else{
+							for(i= 0; i < drag_smooth_count_limit-1; i++){
+								ts->drag_hist[finger][xy].history[i] = ts->drag_hist[finger][xy].history[i+1];
+							}
+						}
+						ts->drag_hist[finger][xy].history[drag_smooth_count_limit-1] = pos;
+
+						ts->drag_hist[finger][xy].count_up_base++;
+					}
+				}
+			#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
+
 			if(ts->drag_hist[finger][xy].dir == dir){
+				#ifndef SHTPS_DRAG_SMOOTH_ENABLE
+					if(ts->drag_hist[finger][xy].count < SHTPS_DRAG_DIR_FIX_CNT){
+						ts->drag_hist[finger][xy].count++;
+					}
+				#else
+					if(SHTPS_DRAG_SMOOTH_DISABLE){
+						if(ts->drag_hist[finger][xy].count < SHTPS_DRAG_DIR_FIX_CNT){
+							ts->drag_hist[finger][xy].count++;
+						}
+					}
+				#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
+
 				if(ts->drag_hist[finger][xy].count < SHTPS_DRAG_DIR_FIX_CNT){
 					ts->drag_hist[finger][xy].count++;
 				}
@@ -5699,7 +5924,13 @@ static void shtps_add_drag_hist(struct shtps_rmi_spi *ts, int xy, int finger, in
 								ts->touch_state.drag_timeout[finger][xy]);
 				}
 			}else{
-				ts->drag_hist[finger][xy].count = 1;
+				#ifndef SHTPS_DRAG_SMOOTH_ENABLE
+					ts->drag_hist[finger][xy].count = 1;
+				#else
+					if(SHTPS_DRAG_SMOOTH_DISABLE){
+						ts->drag_hist[finger][xy].count = 1;
+					}
+				#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
 			}
 
 			ts->drag_hist[finger][xy].dir = dir;
@@ -6491,6 +6722,8 @@ static void shtps_cling_reject_init_variables(struct shtps_rmi_spi *ts)
 	memset(ts->cling_reject.mode16_z_dispersion_occer_count, 0, sizeof(ts->cling_reject.mode16_z_dispersion_occer_count));
 	memset(ts->cling_reject.mode16_z_hist_count, 0, sizeof(ts->cling_reject.mode16_z_hist_count));
 	ts->cling_reject.mode18_state = 0;
+	ts->cling_reject.mode19_detect_state = SHTPS_CLING_REJECT_MODE19_STATE_IDLE;
+	memset(ts->cling_reject.mode20_count, 0, sizeof(ts->cling_reject.mode20_count));
 }
 
 static void shtps_cling_reject_mode10_check_start(struct shtps_rmi_spi *ts)
@@ -6881,6 +7114,17 @@ static int shtps_cling_reject_mode0_check(struct shtps_rmi_spi *ts, struct shtps
 
 	for(i = 0; i < fingerMax; i++){
 		if(info->fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+			if(ts->cling_reject.mode0_cling_cnt[i] > 0 &&
+				ts->fw_report_info_store.fingers[i].state == SHTPS_TOUCH_STATE_NO_TOUCH &&
+				ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER)
+			{
+				if(time_after(jiffies, ts->cling_reject.mode0_tu_time[i] + msecs_to_jiffies(SHTPS_CLING_REJECT_MODE0_TU_ALLOW_TIME)) != 0){
+					ts->cling_reject.mode0_state[i] = 0;
+					ts->cling_reject.mode0_cling_cnt[i] = 0;
+					SHTPS_LOG_CLING_REJECT("[mode_0]<%d> count clear\n", i);
+				}
+			}
+
 			if(ts->fw_report_info_store.fingers[i].state == SHTPS_TOUCH_STATE_NO_TOUCH){
 				ts->cling_reject.mode0_tap_x[i] = info->fingers[i].x;
 				ts->cling_reject.mode0_tap_y[i] = info->fingers[i].y;
@@ -6907,8 +7151,19 @@ static int shtps_cling_reject_mode0_check(struct shtps_rmi_spi *ts, struct shtps
 				}
 			}
 		}else{
-			ts->cling_reject.mode0_state[i] = 0;
-			ts->cling_reject.mode0_cling_cnt[i] = 0;
+			if(ts->fw_report_info_store.fingers[i].state == SHTPS_TOUCH_STATE_FINGER &&
+				ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_NO_TOUCH)
+			{
+				ts->cling_reject.mode0_tu_time[i] = jiffies;
+			}else{
+				if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_NO_TOUCH &&
+					time_after(jiffies, ts->cling_reject.mode0_tu_time[i] + msecs_to_jiffies(SHTPS_CLING_REJECT_MODE0_TU_ALLOW_TIME)) != 0)
+				{
+					ts->cling_reject.mode0_state[i] = 0;
+					ts->cling_reject.mode0_cling_cnt[i] = 0;
+					SHTPS_LOG_CLING_REJECT("[mode_0]<%d> count clear\n", i);
+				}
+			}
 		}
 
 		if(ts->cling_reject.mode0_cling_cnt[i] > ts->cling_reject.mode0_cling_cnt_max){
@@ -7085,15 +7340,67 @@ static int shtps_cling_reject_mode4_check(struct shtps_rmi_spi *ts, struct shtps
 	return 0;
 }
 
-static int shtps_cling_reject_mode5_check(struct shtps_rmi_spi *ts, struct shtps_touch_info *info)
+static void shtps_cling_reject_mode5_rec_touch_pos(struct shtps_rmi_spi *ts)
 {
 	int i;
+	u8 fingerMax = shtps_get_fingermax(ts);
+	
+	ts->cling_reject.mode5_tu_pos_cnt = 0;
+	for(i = 0;i < fingerMax;i++){
+		if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+			ts->cling_reject.mode5_tu_pos[ts->cling_reject.mode5_tu_pos_cnt].x = 
+														ts->fw_report_info.fingers[i].x;
+			ts->cling_reject.mode5_tu_pos[ts->cling_reject.mode5_tu_pos_cnt].y = 
+														ts->fw_report_info.fingers[i].y;
+			ts->cling_reject.mode5_tu_pos_cnt++;
+		}
+	}
+	ts->cling_reject.mode5_wait_for_tu = 1;
+}
+
+static int shtps_cling_reject_mode5_check(struct shtps_rmi_spi *ts, struct shtps_touch_info *info)
+{
+	int i, j;
 	u8 fingerMax = shtps_get_fingermax(ts);
 	u8 numOfFingers = 0;
 	int cling_detect = 0;
 
 	if(SHTPS_CLING_REJECT_MODE5_ENABLE == 0){
 		return 0;
+	}
+
+	if(ts->cling_reject.mode5_wait_for_tu != 0){
+		for(i = 0;i < fingerMax;i++){
+			if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+				numOfFingers++;
+			}
+		}
+		if(numOfFingers == 0){
+			u8 tu_pos_condition = 1;
+
+			SHTPS_LOG_CLING_REJECT("[mode_5] detect all touchup.\n");
+			
+			shtps_rmi_write(ts, ts->map.fn54.commandBase, 0x02);
+			SHTPS_LOG_CLING_REJECT("[mode_5] fw forcecal execute\n");
+			
+			for(i = 0;i < fingerMax && tu_pos_condition != 0;i++){
+				if(ts->fw_report_info_store.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+					for(j = 0;j < ts->cling_reject.mode5_tu_pos_cnt;j++){
+						if(abs(ts->cling_reject.mode5_tu_pos[j].x - ts->fw_report_info_store.fingers[i].x) <= SHTPS_CLING_REJECT_MODE5_TU_POS_THRESH ||
+						   abs(ts->cling_reject.mode5_tu_pos[j].y - ts->fw_report_info_store.fingers[i].y) <= SHTPS_CLING_REJECT_MODE5_TU_POS_THRESH)
+						{
+							tu_pos_condition = 0;
+							break;
+						}
+					}
+				}
+			}
+			
+			if(tu_pos_condition){
+				ts->cling_reject.mode5_wait_for_tu = 0;
+				SHTPS_LOG_CLING_REJECT("[mode_5] proc complete.\n");
+			}
+		}
 	}
 
 	if(ts->cling_reject.forcecal_in_touch == 0){
@@ -7103,8 +7410,10 @@ static int shtps_cling_reject_mode5_check(struct shtps_rmi_spi *ts, struct shtps
 	for(i = 0; i < fingerMax; i++){
 		if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
 			if(ts->fw_report_info_store.fingers[i].state == SHTPS_TOUCH_STATE_NO_TOUCH){
+				ts->cling_reject.mode5_cling_cnt_max[i] = SHTPS_CLING_REJECT_MODE5_CNT / 2;
 				ts->cling_reject.mode5_center_x[i] = ts->fw_report_info.fingers[i].x;
 				ts->cling_reject.mode5_center_y[i] = ts->fw_report_info.fingers[i].y;
+				SHTPS_LOG_CLING_REJECT("[mode_5][%d] td pos = (%d, %d)\n", i, ts->cling_reject.mode5_center_x[i], ts->cling_reject.mode5_center_y[i]);
 			}
 			numOfFingers++;
 		}
@@ -7113,6 +7422,7 @@ static int shtps_cling_reject_mode5_check(struct shtps_rmi_spi *ts, struct shtps
 	if(ts->cling_reject.forcecal_in_touch == 1){
 		if( numOfFingers > 0 ){
 			memset(ts->cling_reject.mode5_cling_cnt, 0, sizeof(ts->cling_reject.mode5_cling_cnt));
+			ts->cling_reject.mode5_end_flag = 0;
 			ts->cling_reject.forcecal_in_touch = 2;
 			SHTPS_LOG_CLING_REJECT("[mode_5] check start\n");
 		}
@@ -7120,33 +7430,51 @@ static int shtps_cling_reject_mode5_check(struct shtps_rmi_spi *ts, struct shtps
 	
 	if(ts->cling_reject.forcecal_in_touch == 2){
 		if(numOfFingers == 0){
-			ts->cling_reject.forcecal_in_touch = 0;
-			SHTPS_LOG_CLING_REJECT("[mode_5] check end\n");
+			if(ts->cling_reject.mode5_end_flag != 0){
+				ts->cling_reject.forcecal_in_touch = 0;
+				SHTPS_LOG_CLING_REJECT("[mode_5] check end\n");
+			}else{
+				memset(ts->cling_reject.mode5_cling_cnt, 0, sizeof(ts->cling_reject.mode5_cling_cnt));
+			}
 		}else{
 			for(i = 0; i < fingerMax; i++){
 				if(info->fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
-					if(abs(ts->fw_report_info.fingers[i].x - ts->cling_reject.mode5_center_x[i]) >= SHTPS_CLING_REJECT_MODE5_POS_THRESH ||
-					   abs(ts->fw_report_info.fingers[i].y - ts->cling_reject.mode5_center_y[i]) >= SHTPS_CLING_REJECT_MODE5_POS_THRESH)
+					SHTPS_LOG_CLING_REJECT("[mode_5][%d] dist = (%lu, %lu)\n", i,
+						abs(ts->fw_report_info.fingers[i].x - ts->cling_reject.mode5_center_x[i]),
+						abs(ts->fw_report_info.fingers[i].y - ts->cling_reject.mode5_center_y[i]));
+					
+					if(ts->cling_reject.mode5_end_flag == 0 &&
+					   (abs(ts->fw_report_info.fingers[i].x - ts->cling_reject.mode5_center_x[i]) >= SHTPS_CLING_REJECT_MODE5_POS_THRESH ||
+					    abs(ts->fw_report_info.fingers[i].y - ts->cling_reject.mode5_center_y[i]) >= SHTPS_CLING_REJECT_MODE5_POS_THRESH))
 					{
-						ts->cling_reject.forcecal_in_touch = 0;
-						SHTPS_LOG_CLING_REJECT("[mode_5] check end by distance\n");
+						ts->cling_reject.mode5_end_flag = 1;
+						SHTPS_LOG_CLING_REJECT("[mode_5]<%d> set check end flag by distance\n", i);
+					}
+					
+					if(abs(ts->fw_report_info.fingers[i].x - ts->cling_reject.mode5_center_x[i]) >= SHTPS_CLING_REJECT_MODE5_CNT_CHANGE_THRESH ||
+					   abs(ts->fw_report_info.fingers[i].y - ts->cling_reject.mode5_center_y[i]) >= SHTPS_CLING_REJECT_MODE5_CNT_CHANGE_THRESH)
+					{
+						ts->cling_reject.mode5_cling_cnt_max[i] = SHTPS_CLING_REJECT_MODE5_CNT;
+						SHTPS_LOG_CLING_REJECT("[mode_5]<%d> change cnt max\n", i);
+					}
+					
+					if(info->fingers[i].z < SHTPS_CLING_REJECT_MODE5_Z_THRESH)
+					{
+						ts->cling_reject.mode5_cling_cnt[i]++;
+						SHTPS_LOG_CLING_REJECT("[mode_5]<%d> cling count up : %d (max:%d)\n", i, 
+													ts->cling_reject.mode5_cling_cnt[i], ts->cling_reject.mode5_cling_cnt_max[i]);
 					}else{
-						if(info->fingers[i].z < SHTPS_CLING_REJECT_MODE5_Z_THRESH)
-						{
-							ts->cling_reject.mode5_cling_cnt[i]++;
-							SHTPS_LOG_CLING_REJECT("[mode_5]<%d> cling count up : %d\n", i, ts->cling_reject.mode5_cling_cnt[i]);
-						}else{
-							ts->cling_reject.mode5_cling_cnt[i]=0;
-						}
+						ts->cling_reject.mode5_cling_cnt[i]=0;
 					}
 				}else{
 					ts->cling_reject.mode5_cling_cnt[i]=0;
 				}
 
-				if(ts->cling_reject.mode5_cling_cnt[i] > SHTPS_CLING_REJECT_MODE5_CNT &&
+				if(ts->cling_reject.mode5_cling_cnt[i] > ts->cling_reject.mode5_cling_cnt_max[i] &&
 					ts->cling_reject.forcecal_in_touch != 0)
 				{
 					cling_detect = 1;
+					shtps_cling_reject_mode5_rec_touch_pos(ts);
 				}
 			}
 		}
@@ -8115,6 +8443,169 @@ static int shtps_cling_reject_mode18_check(struct shtps_rmi_spi *ts, struct shtp
 	return cling_detect;
 }
 
+static int shtps_cling_reject_mode19_check(struct shtps_rmi_spi *ts, struct shtps_touch_info *info)
+{
+	int i;
+	u8 fingerMax = shtps_get_fingermax(ts);
+	int cling_detect = 0;
+	u8  numOfFingers = 0;
+
+	if(SHTPS_CLING_REJECT_MODE19_ENABLE == 0 || ts->cling_reject.mode19_enable == 0){
+		return 0;
+	}
+
+	for(i = 0;i < fingerMax;i++){
+		if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+			numOfFingers++;
+		}
+	}
+	
+	if(time_after(jiffies, ts->cling_reject.mode19_start_time + msecs_to_jiffies(SHTPS_CLING_REJECT_MODE19_ENABLE_TIME))){
+		SHTPS_LOG_CLING_REJECT("[mode_19] check end.\n");
+		ts->cling_reject.mode19_enable = 0;
+		return 0;
+	}
+
+	if(ts->cling_reject.mode19_detect_state == SHTPS_CLING_REJECT_MODE19_STATE_DETECT){
+		if(numOfFingers >= SHTPS_CLING_REJECT_MODE19_FINGER_NUM){
+			if(time_after(jiffies, ts->cling_reject.mode19_detect_start_time + msecs_to_jiffies(SHTPS_CLING_REJECT_MODE19_TOUCH_TIMEOUT_MS))){
+				cling_detect = 1;
+				ts->cling_reject.mode19_detect_state = SHTPS_CLING_REJECT_MODE19_STATE_IDLE;
+				SHTPS_LOG_CLING_REJECT("[mode_19] detect long multi-touching.\n");
+			}
+		}else if(numOfFingers == 0){
+			shtps_rmi_write(ts, ts->map.fn54.commandBase, 0x02);
+			SHTPS_LOG_DBG_PRINT("[mode_19] fw forcecal execute\n");
+			
+			if(SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE){
+				ts->cling_reject.forcecal_in_touch = 1;
+			}
+			
+			ts->cling_reject.mode19_detect_state = SHTPS_CLING_REJECT_MODE19_STATE_IDLE;
+			SHTPS_LOG_CLING_REJECT("[mode_19] detect all touch-up after multi-touching.\n");
+		}else{
+			ts->cling_reject.mode19_detect_state = SHTPS_CLING_REJECT_MODE19_STATE_WAIT_ALL_TOUCHUP;
+		}
+	}else if(ts->cling_reject.mode19_detect_state == SHTPS_CLING_REJECT_MODE19_STATE_WAIT_ALL_TOUCHUP){
+		if(numOfFingers == 0){
+			shtps_rmi_write(ts, ts->map.fn54.commandBase, 0x02);
+			SHTPS_LOG_DBG_PRINT("[mode_19] fw forcecal execute\n");
+			
+			if(SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE){
+				ts->cling_reject.forcecal_in_touch = 1;
+			}
+			
+			SHTPS_LOG_CLING_REJECT("[mode_19] detect all touch-up after multi-touching.\n");
+		}else if(numOfFingers >= SHTPS_CLING_REJECT_MODE19_FINGER_NUM){
+			ts->cling_reject.mode19_detect_state      = SHTPS_CLING_REJECT_MODE19_STATE_DETECT;
+		}
+	}else{
+		if(numOfFingers >= SHTPS_CLING_REJECT_MODE19_FINGER_NUM){
+			ts->cling_reject.mode19_detect_state      = SHTPS_CLING_REJECT_MODE19_STATE_DETECT;
+			ts->cling_reject.mode19_detect_start_time = jiffies;
+			SHTPS_LOG_CLING_REJECT("[mode_19] check start.\n");
+		}
+	}
+	
+	return cling_detect;
+}
+
+static int shtps_cling_reject_mode20_check(struct shtps_rmi_spi *ts, struct shtps_touch_info *info)
+{
+	int i;
+	u8 fingerMax = shtps_get_fingermax(ts);
+	int cling_detect = 0;
+	u8  numOfFingers = 0;
+
+	if(SHTPS_CLING_REJECT_MODE20_ENABLE == 0 || ts->charger_armor_state == 0){
+		return 0;
+	}
+	
+	if(!ts->cling_reject.mode20_wait_for_tu){
+		for(i = 0;i < fingerMax;i++){
+			if(ts->fw_report_info.fingers[i].state != ts->fw_report_info_store.fingers[i].state){
+				if(ts->cling_reject.mode20_count[i] == 0){
+					if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+						SHTPS_LOG_CLING_REJECT("[mode_20][%d] check start.\n", i);
+						ts->cling_reject.mode20_time[i]  = jiffies;
+						ts->cling_reject.mode20_count[i] = 1;
+					}
+				}else{
+					if(time_after(jiffies, ts->cling_reject.mode20_time[i] + msecs_to_jiffies(SHTPS_CLING_REJECT_MODE20_INTERVAL_THRESH))){
+						if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+							SHTPS_LOG_CLING_REJECT("[mode_20][%d] check re-start.\n", i);
+							ts->cling_reject.mode20_time[i]  = jiffies;
+							ts->cling_reject.mode20_count[i] = 1;
+						}else{
+							SHTPS_LOG_CLING_REJECT("[mode_20][%d] check stop.\n", i);
+							ts->cling_reject.mode20_count[i] = 0;
+						}
+					}else{
+						ts->cling_reject.mode20_time[i] = jiffies;
+						ts->cling_reject.mode20_count[i]++;
+						
+						if(ts->cling_reject.mode20_count[i] > SHTPS_CLING_REJECT_MODE20_COUNT_MAX){
+							SHTPS_LOG_CLING_REJECT("[mode_20][%d] detect.\n", i);
+							ts->cling_reject.mode20_wait_for_tu = 1;
+							cling_detect = 1;
+							
+							if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+								ts->cling_reject.mode20_tu_pos.x = ts->fw_report_info.fingers[i].x;
+								ts->cling_reject.mode20_tu_pos.y = ts->fw_report_info.fingers[i].y;
+							}else{
+								ts->cling_reject.mode20_tu_pos.x = ts->fw_report_info_store.fingers[i].x;
+								ts->cling_reject.mode20_tu_pos.y = ts->fw_report_info_store.fingers[i].y;
+							}
+						}
+					}
+				}
+			}else{
+				if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+					SHTPS_LOG_CLING_REJECT("[mode_20][%d] check stop.\n", i);
+					ts->cling_reject.mode20_count[i] = 0;
+				}
+			}
+		}
+	}else{
+		for(i = 0;i < fingerMax;i++){
+			if(ts->fw_report_info.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+				numOfFingers++;
+			}
+		}
+		if(numOfFingers == 0){
+			u8 tu_pos_condition = 1;
+
+			SHTPS_LOG_CLING_REJECT("[mode_20] detect all touchup.\n");
+			
+			shtps_rmi_write(ts, ts->map.fn54.commandBase, 0x02);
+			SHTPS_LOG_DBG_PRINT("[mode_20] fw forcecal execute\n");
+			
+			if(SHTPS_CLING_REJECT_MODE5_ALWAYS_ENABLE){
+				ts->cling_reject.forcecal_in_touch = 1;
+			}
+
+			for(i = 0;i < fingerMax;i++){
+				if(ts->fw_report_info_store.fingers[i].state == SHTPS_TOUCH_STATE_FINGER){
+					if(abs(ts->cling_reject.mode20_tu_pos.x - ts->fw_report_info_store.fingers[i].x) <= SHTPS_CLING_REJECT_MODE20_TU_POS_THRESH ||
+					   abs(ts->cling_reject.mode20_tu_pos.y - ts->fw_report_info_store.fingers[i].y) <= SHTPS_CLING_REJECT_MODE20_TU_POS_THRESH)
+					{
+						tu_pos_condition = 0;
+						break;
+					}
+				}
+			}
+			
+			if(tu_pos_condition){
+				ts->cling_reject.mode20_wait_for_tu = 0;
+				SHTPS_LOG_CLING_REJECT("[mode_20] proc complete.\n");
+			}
+		}
+	}
+	
+	return cling_detect;
+}
+
+
 static void shtps_cling_reject_check(struct shtps_rmi_spi *ts, struct shtps_touch_info *info)
 {
 	int cling_detect = 0;
@@ -8276,6 +8767,28 @@ static void shtps_cling_reject_check(struct shtps_rmi_spi *ts, struct shtps_touc
 		}
 	}
 
+	if( shtps_cling_reject_mode19_check(ts, info) != 0){
+		SHTPS_LOG_CLING_REJECT("cling detect by <mode : 19>\n");
+		cling_detect = 1;
+
+		if(SHTPS_CLING_REJECT_MODE19_REZERO_TYPE == 0){
+			need_rezero = 1;
+		}else{
+			need_force_cal = 1;
+		}
+	}
+
+	if( shtps_cling_reject_mode20_check(ts, info) != 0){
+		SHTPS_LOG_CLING_REJECT("cling detect by <mode : 20>\n");
+		cling_detect = 1;
+
+		if(SHTPS_CLING_REJECT_MODE20_REZERO_TYPE == 0){
+			need_rezero = 1;
+		}else{
+			need_force_cal = 1;
+		}
+	}
+	
 	if(cling_detect != 0)
 	{
 		int i;
@@ -9023,6 +9536,110 @@ static void shtps_lgm_split_touch_combining_check(struct shtps_rmi_spi *ts, stru
 }
 #endif /* SHTPS_LGM_SPLIT_TOUCH_COMBINING_ENABLE */
 
+#if defined( SHTPS_DRAG_SMOOTH_ENABLE )
+#if defined( SHTPS_LOG_DEBUG_ENABLE )
+int SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(int val)
+{
+	int i;
+	int dec_val = (val) - SHTPS_DRAG_SMOOTH_INT_TO_FIXED(SHTPS_DRAG_SMOOTH_FIXED_TO_INT((val)));
+	int ret = 0;
+	int add_val = 10;
+	for(i = 0; i < SHTPS_DRAG_SMOOTH_FIXED_SHIFT; i++){
+		add_val *= 10;
+	}
+	for(i = 1; i < SHTPS_DRAG_SMOOTH_FIXED_SHIFT; i++){
+		add_val /= 2;
+		if((dec_val >> (SHTPS_DRAG_SMOOTH_FIXED_SHIFT - i)) & 0x01){
+			ret += add_val;
+		}
+	}
+	return ret/1000000;
+}
+#endif /* SHTPS_LOG_DEBUG_ENABLE */
+static void shtps_pos_compensation(struct shtps_rmi_spi *ts, struct shtps_touch_info *info, int xy)
+{
+	int inc_ave_FIXED,temp_FIXED;
+	int i;
+	int drag_smooth_leave_max_dot_FIXED;
+	int last_history;
+	int last_history_FIXED;
+
+	if(SHTPS_DRAG_SMOOTH_DISABLE){
+		return;
+	}
+
+	for(i = 0;i < shtps_get_fingermax(ts);i++){
+		if(info->fingers[i].state == SHTPS_TOUCH_STATE_FINGER /* info->fingers[i].state == SHTPS_TOUCH_STATE_PEN */){
+			if(ts->report_info.fingers[i].state != SHTPS_TOUCH_STATE_NO_TOUCH){
+				if(ts->drag_hist[i][xy].count >= SHTPS_DRAG_SMOOTH_COUNT_MIN){
+					drag_smooth_leave_max_dot_FIXED = SHTPS_DRAG_SMOOTH_INT_TO_FIXED(SHTPS_DRAG_SMOOTH_LEAVE_MAX_DOT);
+					last_history		= ts->drag_hist[i][xy].history[ts->drag_hist[i][xy].count - 1];
+					last_history_FIXED	= SHTPS_DRAG_SMOOTH_INT_TO_FIXED(last_history);
+
+					inc_ave_FIXED = SHTPS_DRAG_SMOOTH_INT_TO_FIXED(last_history- ts->drag_hist[i][xy].history[0]) / (ts->drag_hist[i][xy].count-1);
+					SHTPS_LOG_DRAG_SMOOTH("   [X]inc_ave=%d.%03d history[0]=%d\n", SHTPS_DRAG_SMOOTH_FIXED_TO_INT(inc_ave_FIXED), SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(inc_ave_FIXED), ts->drag_hist[i][xy].history[0]);
+					if(xy == SHTPS_POSTYPE_X){
+						if(ts->drag_hist[i][xy].history_old == last_history){
+							info->fingers[i].x = SHTPS_DRAG_SMOOTH_FIXED_TO_INT(ts->drag_hist[i][xy].pre_comp_history_FIXED);
+						}else{
+							if(((ts->drag_hist[i][xy].pre_comp_history_FIXED + inc_ave_FIXED) - last_history_FIXED ) > drag_smooth_leave_max_dot_FIXED){
+								temp_FIXED = last_history_FIXED + drag_smooth_leave_max_dot_FIXED;
+								SHTPS_LOG_DRAG_SMOOTH("   [X]temp=%d.%03d(upper limit)\n", SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED), SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(temp_FIXED));
+							}else if(((ts->drag_hist[i][xy].pre_comp_history_FIXED + inc_ave_FIXED) - last_history_FIXED ) < (0-drag_smooth_leave_max_dot_FIXED)){
+								temp_FIXED = last_history_FIXED - drag_smooth_leave_max_dot_FIXED;
+								SHTPS_LOG_DRAG_SMOOTH("   [X]temp=%d.%03d(lower limit)\n", SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED), SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(temp_FIXED));
+							}else{
+								temp_FIXED = ts->drag_hist[i][xy].pre_comp_history_FIXED + inc_ave_FIXED;
+								SHTPS_LOG_DRAG_SMOOTH("   [X]temp=%d.%03d\n", SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED), SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(temp_FIXED));
+							}
+
+							if(temp_FIXED < 0){
+								info->fingers[i].x = 0;
+								ts->drag_hist[i][xy].pre_comp_history_FIXED = 0;
+							}else if(temp_FIXED >= SHTPS_DRAG_SMOOTH_INT_TO_FIXED(CONFIG_SHTPS_SY3000_PANEL_SIZE_X)){
+								info->fingers[i].x = CONFIG_SHTPS_SY3000_PANEL_SIZE_X -1;
+								ts->drag_hist[i][xy].pre_comp_history_FIXED = SHTPS_DRAG_SMOOTH_INT_TO_FIXED(info->fingers[i].x);
+							} else{
+								info->fingers[i].x = SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED);
+								ts->drag_hist[i][xy].pre_comp_history_FIXED = temp_FIXED;
+							}
+							ts->drag_hist[i][xy].history_old = last_history;
+						}
+					}else{
+						if(ts->drag_hist[i][xy].history_old == last_history){
+							info->fingers[i].y = SHTPS_DRAG_SMOOTH_FIXED_TO_INT(ts->drag_hist[i][xy].pre_comp_history_FIXED);
+						}else{
+							if(((ts->drag_hist[i][xy].pre_comp_history_FIXED + inc_ave_FIXED) - last_history_FIXED ) > drag_smooth_leave_max_dot_FIXED){
+								temp_FIXED = last_history_FIXED + drag_smooth_leave_max_dot_FIXED;
+								SHTPS_LOG_DRAG_SMOOTH("   [Y]temp=%d.%03d(upper limit)\n", SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED), SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(temp_FIXED));
+							}else if(((ts->drag_hist[i][xy].pre_comp_history_FIXED + inc_ave_FIXED) - last_history_FIXED ) < (0-drag_smooth_leave_max_dot_FIXED)){
+								temp_FIXED = last_history_FIXED - drag_smooth_leave_max_dot_FIXED;
+								SHTPS_LOG_DRAG_SMOOTH("   [Y]temp=%d.%03d(lower limit)\n", SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED), SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(temp_FIXED));
+							}else{
+								temp_FIXED = ts->drag_hist[i][xy].pre_comp_history_FIXED + inc_ave_FIXED;
+								SHTPS_LOG_DRAG_SMOOTH("   [Y]temp=%d.%03d\n", SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED), SHTPS_DRAG_SMOOTH_GET_DEC_FROM_FIXED(temp_FIXED));
+							}
+
+							if(temp_FIXED < 0){
+								info->fingers[i].y = 0;
+								ts->drag_hist[i][xy].pre_comp_history_FIXED = 0;
+							}else if(temp_FIXED >= SHTPS_DRAG_SMOOTH_INT_TO_FIXED(CONFIG_SHTPS_SY3000_PANEL_SIZE_Y)){
+								info->fingers[i].y = CONFIG_SHTPS_SY3000_PANEL_SIZE_Y -1;
+								ts->drag_hist[i][xy].pre_comp_history_FIXED = SHTPS_DRAG_SMOOTH_INT_TO_FIXED(info->fingers[i].y);
+							} else{
+								info->fingers[i].y = SHTPS_DRAG_SMOOTH_FIXED_TO_INT(temp_FIXED);
+								ts->drag_hist[i][xy].pre_comp_history_FIXED = temp_FIXED;
+							}
+							ts->drag_hist[i][xy].history_old = last_history;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
+
 static void shtps_calc_notify(struct shtps_rmi_spi *ts, u8 *buf, struct shtps_touch_info *info, u8 *event)
 {
 	int		i;
@@ -9103,6 +9720,23 @@ static void shtps_calc_notify(struct shtps_rmi_spi *ts, u8 *buf, struct shtps_to
 	}
 	info->finger_num = numOfFingers;
 
+	for(i = 0;i < fingerMax;i++){
+		if(info->fingers[i].state != SHTPS_TOUCH_STATE_NO_TOUCH){
+			if(ts->report_info.fingers[i].state != SHTPS_TOUCH_STATE_NO_TOUCH){
+				shtps_add_drag_hist(ts, SHTPS_POSTYPE_X, i, info->fingers[i].x);
+				shtps_add_drag_hist(ts, SHTPS_POSTYPE_Y, i, info->fingers[i].y);
+			}
+		}else{
+			shtps_init_drag_hist(ts, SHTPS_POSTYPE_X, i, info->fingers[i].x);
+			shtps_init_drag_hist(ts, SHTPS_POSTYPE_Y, i, info->fingers[i].y);
+		}
+	}
+
+	#if defined(SHTPS_DRAG_SMOOTH_ENABLE)
+		shtps_pos_compensation(ts, info, SHTPS_POSTYPE_X);
+		shtps_pos_compensation(ts, info, SHTPS_POSTYPE_Y);
+	#endif /* SHTPS_DRAG_SMOOTH_ENABLE */
+
 	dragStep1stX = shtps_get_dragstep(ts, SHTPS_POSTYPE_X, SHTPS_DRAG_THRESHOLD_1ST, numOfFingers);
 	dragStep1stY = shtps_get_dragstep(ts, SHTPS_POSTYPE_Y, SHTPS_DRAG_THRESHOLD_1ST, numOfFingers);
 	for(i = 0;i < fingerMax;i++){
@@ -9119,10 +9753,6 @@ static void shtps_calc_notify(struct shtps_rmi_spi *ts, u8 *buf, struct shtps_to
 		dragStepCurY = shtps_get_dragstep(ts, SHTPS_POSTYPE_Y, ts->touch_state.dragStep[i][SHTPS_POSTYPE_Y], numOfFingers);
 
 		if(info->fingers[i].state != SHTPS_TOUCH_STATE_NO_TOUCH){
-			if(ts->report_info.fingers[i].state != SHTPS_TOUCH_STATE_NO_TOUCH){
-				shtps_add_drag_hist(ts, SHTPS_POSTYPE_X, i, info->fingers[i].x);
-				shtps_add_drag_hist(ts, SHTPS_POSTYPE_Y, i, info->fingers[i].y);
-			}
 
 			diff_x = shtps_get_diff(info->fingers[i].x, ts->report_info.fingers[i].x, SHTPS_POS_SCALE_X(ts));
 			diff_y = shtps_get_diff(info->fingers[i].y, ts->report_info.fingers[i].y, SHTPS_POS_SCALE_Y(ts));
@@ -9185,9 +9815,6 @@ static void shtps_calc_notify(struct shtps_rmi_spi *ts, u8 *buf, struct shtps_to
 		}else{
 			shtps_set_dragstep(ts, info, SHTPS_DRAG_THRESHOLD_ZERO, SHTPS_POSTYPE_X, i);
 			shtps_set_dragstep(ts, info, SHTPS_DRAG_THRESHOLD_ZERO, SHTPS_POSTYPE_Y, i);
-
-			shtps_init_drag_hist(ts, SHTPS_POSTYPE_X, i, info->fingers[i].x);
-			shtps_init_drag_hist(ts, SHTPS_POSTYPE_Y, i, info->fingers[i].y);
 		}
 
 		if(info->fingers[i].state != ts->report_info.fingers[i].state){
@@ -11813,6 +12440,7 @@ static int shtps_statef_sleep_enter(struct shtps_rmi_spi *ts, int param)
 		shtps_cling_reject_mode16_delayed_work_cancel(ts);
 		ts->cling_reject.mode17_state = SHTPS_CLING_REJECT_MODE17_STATE_IDLE;
 		memset(ts->cling_reject.mode17_z_num, 0, sizeof(ts->cling_reject.mode17_z_num));
+		ts->cling_reject.mode19_enable = 0;
 
 		#if defined( SHTPS_MODULE_PARAM_ENABLE )
 			SHTPS_CLING_REJECT_REZERO_EXEC_COUNT = 0;
@@ -11931,6 +12559,8 @@ static int shtps_statef_sleep_wakeup(struct shtps_rmi_spi *ts, int param)
 		ts->cling_reject.mode0_cling_cnt_change_state = 1;
 		SHTPS_LOG_CLING_REJECT("[mode_0] count max change to %d\n", ts->cling_reject.mode0_cling_cnt_max);
 
+		ts->cling_reject.mode5_wait_for_tu = 0;
+
 		ts->cling_reject.mode11_effect_time = jiffies + msecs_to_jiffies(SHTPS_CLING_REJECT_MODE11_EFFECT_TIME);
 		ts->cling_reject.mode11_effect_state = 1;
 		SHTPS_LOG_CLING_REJECT("[mode_11] enable\n");
@@ -11940,6 +12570,13 @@ static int shtps_statef_sleep_wakeup(struct shtps_rmi_spi *ts, int param)
 		ts->cling_reject.mode15_state = 0;
 		ts->cling_reject.mode15_lcd_on_first_td_check = 1;
 		ts->cling_reject.mode16_state = SHTPS_CLING_REJECT_MODE16_STATE_WAIT_TOUCH;
+		
+		ts->cling_reject.mode19_enable = 1;
+		ts->cling_reject.mode19_start_time = jiffies;
+		SHTPS_LOG_CLING_REJECT("[mode_19] enable\n");
+
+		ts->cling_reject.mode20_wait_for_tu = 0;
+		SHTPS_LOG_CLING_REJECT("[mode_20] enable\n");
 	#endif /* SHTPS_CLING_REJECTION_ENABLE */
 
 	shtps_rezero_request(ts,
@@ -13717,8 +14354,10 @@ static int shtps_init_internal_variables(struct shtps_rmi_spi *ts)
 		shtps_cling_reject_init_variables(ts);
 		ts->cling_reject.no_touch_reaction_check_state = 0;
 		ts->cling_reject.forcecal_in_touch = 0;
+		ts->cling_reject.mode5_wait_for_tu = 0;
 		ts->cling_reject.mode17_state = SHTPS_CLING_REJECT_MODE17_STATE_IDLE;
 		memset(ts->cling_reject.mode17_z_num, 0, sizeof(ts->cling_reject.mode17_z_num));
+		ts->cling_reject.mode19_enable = 0;
 		INIT_DELAYED_WORK(&ts->cling_reject.no_touch_reaction_check_delayed_work, shtps_cling_reject_no_touch_reaction_check_delayed_work_function);
 		INIT_DELAYED_WORK(&ts->cling_reject.mode10_delayed_work, shtps_cling_reject_mode10_delayed_work_function);
 		INIT_DELAYED_WORK(&ts->cling_reject.mode14_proximity_check_delayed_work, shtps_cling_reject_mode14_proximity_check_delayed_work_function);

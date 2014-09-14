@@ -168,6 +168,7 @@ static int shdisp_panel_mipi_dsi_cmd_dma_post_rx(void);
 static unsigned char shdisp_panel_API_get_fw_transfer_mode_w(int dtype, int dsi_mode);
 static unsigned char shdisp_panel_API_get_fw_transfer_mode_r(int dsi_mode);
 
+extern int shdisp_get_usb_info(void);
 
 /* ------------------------------------------------------------------------- */
 /* DEBUG MACROS                                                              */
@@ -917,14 +918,14 @@ void shdisp_panel_API_request_RateCtrl( int ctrl, unsigned char maxFR, unsigned 
 
     SHDISP_TRACE("in\n");
     if( ctrl ){
-#if defined(CONFIG_SHDISP_PANEL_ANDY) || defined(CONFIG_SHDISP_PANEL_RYOMA) || defined(CONFIG_SHDISP_PANEL_GEMINI)
+        if ( shdisp_get_usb_info() == SHDISP_MAIN_BKL_CHG_ON ) {
+            maxFR = SHDISP_PANEL_RATE_60_0;
+            minFR = SHDISP_PANEL_RATE_60_0;
+        }
         param[0] = ( ((maxFR&0x0f) << 4) | (minFR&0x0f) );
-#else /* defined(CONFIG_SHDISP_PANEL_ANDY) || defined(CONFIG_SHDISP_PANEL_RYOMA) || defined(CONFIG_SHDISP_PANEL_GEMINI) */
-        param[0] = 0x00;
-#endif /* defined(CONFIG_SHDISP_PANEL_ANDY) || defined(CONFIG_SHDISP_PANEL_RYOMA) || defined(CONFIG_SHDISP_PANEL_GEMINI) */
     }
     else {
-         param[0] = param[1] = 0;
+        param[0] = param[1] = 0;
     }
 
     shdisp_FWCMD_set_apino(SHDISP_CLMR_FWCMD_APINO_LCD);

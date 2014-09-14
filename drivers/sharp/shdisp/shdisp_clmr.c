@@ -4794,7 +4794,7 @@ static void shdisp_workqueue_handler_clmr(struct work_struct* work)
     shdisp_SYS_clmr_sio_transfer(SHDISP_CLMR_REG_INTR, NULL, 0, regINTR, 4);
 
     if (!(*(unsigned int*)regINTR)) {
-        SHDISP_ERR("HINT interruption occurred. But not set Calimero INTR register.\n");
+        SHDISP_ERR("HINT interruption occurred. But not set Clmr INTR register.\n");
 #ifdef SHDISP_RESET_LOG
         err_code.mode = SHDISP_DBG_MODE_LINUX;
         err_code.type = SHDISP_DBG_TYPE_CLMR_HW;
