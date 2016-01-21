@@ -35,6 +35,9 @@ extern int msm_headset_hp_state(void);
 extern int msm_headset_bu_state(void);
 extern int tabla_codec_set_bias_mode(int mode);
 #endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-008 */
+#ifdef CONFIG_SH_AUDIO_DRIVER /* 05-195 */
+extern void msm_codec_set_a2dp_mode(int mode);
+#endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-195 */
 
 /* max number of user-defined controls */
 #define MAX_USER_CONTROLS	32
@@ -793,6 +796,18 @@ static int snd_ctl_set_bias_mode(int __user *_state)
 }
 #endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-008 */
 
+#ifdef CONFIG_SH_AUDIO_DRIVER /* 05-195 */
+static int snd_ctl_set_a2dp_mode(int __user *_state){
+	
+	int mode;
+	if(get_user(mode, _state)){
+		return -EFAULT;
+	}
+	msm_codec_set_a2dp_mode(mode);
+	return 0;
+}
+#endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-195 */
+
 static int snd_ctl_elem_info(struct snd_ctl_file *ctl,
 			     struct snd_ctl_elem_info *info)
 {
@@ -1426,6 +1441,10 @@ static long snd_ctl_ioctl(struct file *file, unsigned int cmd, unsigned long arg
 	case SNDRV_CTL_IOCTL_SET_BIAS_MODE:
 		return snd_ctl_set_bias_mode(ip);
 #endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-008 */
+#ifdef CONFIG_SH_AUDIO_DRIVER /* 05-195 */
+	case SNDRV_CTL_IOCTL_SET_A2DP_MODE:
+		return snd_ctl_set_a2dp_mode(ip);
+#endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-195 */
 	}
 	down_read(&snd_ioctl_rwsem);
 	list_for_each_entry(p, &snd_control_ioctls, list) {

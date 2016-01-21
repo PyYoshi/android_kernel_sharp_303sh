@@ -5486,10 +5486,6 @@ static void shdisp_recovery_psals(void)
     shdisp_recovery_psals_queued_flag = 0;
     up(&shdisp_sem_req_recovery_psals);
 
-    if( ps_flg == SHDISP_DEV_STATE_ON){
-        msleep(20);
-        PROX_recovery_end_func();
-    }
 #if !defined(CONFIG_SHDISP_PANEL_GEMINI)
     result = shdisp_bdic_API_psals_is_recovery_successful();
     if (result != SHDISP_RESULT_SUCCESS) {
@@ -5501,6 +5497,12 @@ static void shdisp_recovery_psals(void)
 
     shdisp_pm_clmr_power_manager(SHDISP_DEV_TYPE_RECOVER, SHDISP_DEV_STATE_OFF);
     shdisp_semaphore_end_with_pll_off(__func__);
+
+    if( ps_flg == SHDISP_DEV_STATE_ON){
+        msleep(20);
+        SHDISP_DEBUG("PROX_recovery_end_func.\n");
+        PROX_recovery_end_func();
+    }
 
     if( (result == SHDISP_RESULT_SUCCESS)
     ||  (shdisp_kerl_ctx.main_disp_status == SHDISP_MAIN_DISP_ON)

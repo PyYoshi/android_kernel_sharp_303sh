@@ -630,6 +630,20 @@ int msm_headset_bu_state(void)
 EXPORT_SYMBOL_GPL(msm_headset_bu_state);
 #endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-008 */
 
+#ifdef CONFIG_SH_AUDIO_DRIVER /* 05-195 */
+#include <mach/perflock.h>
+static struct perf_lock a2dp_perf_lock;
+
+void msm_codec_set_a2dp_mode(int mode){
+	if(mode){
+		perf_lock(&a2dp_perf_lock);
+	}else{
+		perf_unlock(&a2dp_perf_lock);
+	}
+}
+EXPORT_SYMBOL_GPL(msm_codec_set_a2dp_mode);
+#endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-195 */
+
 static unsigned short rx_digital_gain_reg[] = {
 	TAIKO_A_CDC_RX1_VOL_CTL_B2_CTL,
 	TAIKO_A_CDC_RX2_VOL_CTL_B2_CTL,
@@ -6621,6 +6635,10 @@ static int taiko_codec_probe(struct snd_soc_codec *codec)
 #ifdef CONFIG_SH_AUDIO_DRIVER /* 05-008 */
     taiko_switch = taiko;
 #endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-008 */
+
+#ifdef CONFIG_SH_AUDIO_DRIVER /* 05-195 */
+	perf_lock_init(&a2dp_perf_lock,  PERF_LOCK_652800KHz, "a2dp");
+#endif /* CONFIG_SH_AUDIO_DRIVER *//* 05-195 */
 
 	return ret;
 

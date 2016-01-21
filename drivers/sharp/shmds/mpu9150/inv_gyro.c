@@ -3581,7 +3581,12 @@ static irqreturn_t inv_read_fifo(int irq, void *dev_id)
 	unsigned int copied;
 	s64 timestamp;
 	struct inv_reg_map_s *reg;
+/* shmds add 17-4 -> */
+	static s64 start_time = 0LL;
+	static s64 end_time = 0LL;
 
+	start_time = get_time_ns();
+/* shmds add 17-4 <- */
 	st = (struct inv_gyro_state_s *)dev_id;
 	reg = &st->reg;
 
@@ -3624,6 +3629,12 @@ static irqreturn_t inv_read_fifo(int irq, void *dev_id)
 		st->chip_config.gyro_fifo_enable)*BYTES_PER_SENSOR;
 	fifo_count = 0;
 	if (bytes_per_datum != 0) {
+/* shmds add 17-4 -> */
+		if(end_time != 0LL && start_time - end_time < 100000LL)
+		{
+			usleep(1000);
+	    }
+/* shmds add 17-4 <- */
 		result = inv_i2c_read(st, reg->fifo_count_h, 2, data);
 		if (result)
 			goto end_session;
@@ -3689,6 +3700,9 @@ end_session:
 /* shmds add 17-2 -> */
 	shmds_wake_lock_end();
 /* shmds add 17-2 <- */
+/* shmds add 17-4 -> */
+	end_time = get_time_ns();
+/* shmds add 17-4 <- */
 	return IRQ_HANDLED;
 flush_fifo:
 	/* Flush HW and SW FIFOs. */
@@ -3700,6 +3714,9 @@ flush_fifo:
 /* shmds add 17-2 -> */
 	shmds_wake_lock_end();
 /* shmds add 17-2 <- */
+/* shmds add 17-4 -> */
+	end_time = get_time_ns();
+/* shmds add 17-4 <- */
 	return IRQ_HANDLED;
 }
 
